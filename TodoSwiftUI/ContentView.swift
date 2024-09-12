@@ -44,6 +44,15 @@ struct ContentView: View {
         }
     }
     
+    private func deleteTodoItem(_ todoItem: TodoItem) {
+        viewContext.delete(todoItem)
+        do {
+            try viewContext.save()
+        } catch {
+            print(error)
+        }
+    }
+    
     var body: some View {
         VStack {
             TextField("Title", text: $title)
@@ -63,6 +72,12 @@ struct ContentView: View {
                         ForEach(pendingTodoItems) { todoItem in
                             TodoCellView(todoItem: todoItem, onChanged: updateTodoItem)
                         }
+                        .onDelete { indexSet in
+                            indexSet.forEach { index in
+                                let deleteItem = pendingTodoItems[index]
+                                deleteTodoItem(deleteItem)
+                            }
+                        }
                     }
                 }
                 
@@ -72,6 +87,12 @@ struct ContentView: View {
                     } else {
                         ForEach(completedTodoItems) { todoItem in
                             TodoCellView(todoItem: todoItem, onChanged: updateTodoItem)
+                        }
+                        .onDelete { indexSet in
+                            indexSet.forEach { index in
+                                let deleteItem = completedTodoItems[index]
+                                deleteTodoItem(deleteItem)
+                            }
                         }
                     }
                 }
